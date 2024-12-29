@@ -25,10 +25,10 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
       - name: Run my variable
-        run: echo "my variable :${USER_NAME}"
+        run: echo "my variable :$USER_NAME"
         
       - name: Run who
-        run: echo "myusername :${whoami}"
+        run: echo "myusername :$whoami"
 
       - name: Run PWD
         run: pwd
