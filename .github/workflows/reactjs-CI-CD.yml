@@ -32,7 +32,7 @@ jobs:
           
       - name: Install package with npm
         run: |
-          cd ${{ vars.REACT_APP_PATH }}
+          pwd
           npm install    
           
       # - name: Build react app
