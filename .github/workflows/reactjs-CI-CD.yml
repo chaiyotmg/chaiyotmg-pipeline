@@ -18,7 +18,7 @@ jobs:
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
-          rm -rf ${{ vars.REACT_APP_PATH }}/*
+          sudo rm -rf ${{ vars.REACT_APP_PATH }}/*
           
       - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
         uses: actions/checkout@v2
@@ -43,14 +43,14 @@ jobs:
       - name: Create dir
         run: |
           if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
-              mkdir -p ${{ vars.REACT_APP_PATH }}
+              sudo mkdir -p ${{ vars.REACT_APP_PATH }}
               echo "Directory created: ${{ vars.REACT_APP_PATH }}"
           fi
         
       - name: Copy files to target dir
         run: |
           if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
-              cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
+              sudo cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
               echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
           else
               echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
