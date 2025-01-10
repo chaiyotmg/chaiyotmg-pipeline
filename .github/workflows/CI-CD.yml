@@ -27,15 +27,15 @@ jobs:
 
       - name: Create dir
         run: |
-          if [ ! -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-              mkdir -p "${{ vars.NODEJS_APP_PATH }}"
+          if [ ! -d ${{ vars.NODEJS_APP_PATH }} ]; then
+              mkdir -p ${{ vars.NODEJS_APP_PATH }}
               echo "Directory created: ${{ vars.NODEJS_APP_PATH }}"
           fi
           
       - name: Copy files to target dir
         run: |
-          if [ -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-              cp * "${{ vars.NODEJS_APP_PATH }}"
+          if [ -d ${{ vars.NODEJS_APP_PATH }} ]; then
+              cp * ${{ vars.NODEJS_APP_PATH }}
               echo "Files copied to: ${{ vars.NODEJS_APP_PATH }}"
           else
               echo "Dir not found!! : ${{ vars.NODEJS_APP_PATH }}"
