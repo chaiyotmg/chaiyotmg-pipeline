@@ -51,7 +51,6 @@ jobs:
       - name: Install package with npm
         run: |
           cd ${{ vars.NODEJS_APP_PATH }}
-          npm cache clean
           npm install
         
       - name: Start app!
