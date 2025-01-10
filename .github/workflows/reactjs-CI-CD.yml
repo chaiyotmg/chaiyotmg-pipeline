@@ -35,27 +35,27 @@ jobs:
           cd ${{ vars.REACT_APP_NAME }}
           npm install    
           
-      # - name: Build react app
-      #   run: |
-      #     cd ${{ vars.REACT_APP_PATH }}
-      #     npm run build
+      - name: Build react app
+        run: |
+          cd ${{ vars.REACT_APP_NAME }}
+          npm run build
           
-      # - name: Create dir
-      #   run: |
-      #     if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
-      #         mkdir -p ${{ vars.REACT_APP_PATH }}
-      #         echo "Directory created: ${{ vars.REACT_APP_PATH }}"
-      #     fi
+      - name: Create dir
+        run: |
+          if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
+              mkdir -p ${{ vars.REACT_APP_PATH }}
+              echo "Directory created: ${{ vars.REACT_APP_PATH }}"
+          fi
         
-      # - name: Copy files to target dir
-      #   run: |
-      #     if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
-      #         cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
-      #         echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
-      #     else
-      #         echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
-      #     fi
+      - name: Copy files to target dir
+        run: |
+          if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
+              cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
+              echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
+          else
+              echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
+          fi
 
-      # - name: Restart nginx!
-      #   run: |
-      #     systemctl restart nginx
+      - name: Restart nginx!
+        run: |
+          systemctl restart nginx
