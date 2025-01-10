@@ -55,6 +55,7 @@ jobs:
         
       - name: Start app!
         run: |
+          pm2 kill
           pm2 start ${{ vars.NODEJS_APP_PATH }}/index.js --name '${{ vars.NODEJS_APP_NAME }}'
           pm2 save
           sleep 2
