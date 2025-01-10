@@ -17,14 +17,17 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
-      
-      - name: Download Repository as ZIP
+    
+      - name: Download poc-nodejs as ZIP
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          BRANCH: ${{ inputs.branch }}
         run: |
           curl -H "Authorization: token $GITHUB_TOKEN" \
-               -L -o repo.zip \
-               https://api.github.com/repos/chaiyodcymg/poc-nodejs/zipball/main
+               -L -o poc-nodejs.zip \
+               https://api.github.com/repos/chaiyodcymg/poc-nodejs/poc-nodejs/$BRANCH
+               unzip poc-nodejs.zip -d poc-nodejs
+               ls poc-nodejs
 
                
       - name: Run my variable
