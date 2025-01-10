@@ -42,7 +42,7 @@ jobs:
       - name: Copy files to target dir
         run: |
           if [ -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-              cp -r $(pwd)/* ${{ vars.NODEJS_APP_PATH }}/
+              cp -r $(pwd)/${{ vars.NODEJS_APP_NAME }}/* ${{ vars.NODEJS_APP_PATH }}/
               echo "Files copied to: ${{ vars.NODEJS_APP_PATH }}"
           else
               echo "Dir not found!! : ${{ vars.NODEJS_APP_PATH }}"
