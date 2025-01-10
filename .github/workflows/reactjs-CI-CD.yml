@@ -17,8 +17,8 @@ jobs:
       - name: Clean up workspace
         run: |
           echo "Cleaning up temporary files..."
-          rm -rf $(pwd)/*
-          rm -rf ${{ vars.REACT_APP_PATH }}/*
+          sudo rm -rf $(pwd)/*
+          sudo rm -rf ${{ vars.REACT_APP_PATH }}/*
           
       - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
         uses: actions/checkout@v2
