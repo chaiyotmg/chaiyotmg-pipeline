@@ -40,7 +40,7 @@ jobs:
       - name: Copy files to target dir
         run: |
           if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
-              cp -r $(pwd)/${{ vars.REACT_APP_PATH }}/* ${{ vars.REACT_APP_PATH }}/
+              cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/* ${{ vars.REACT_APP_PATH }}/
               echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
           else
               echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
