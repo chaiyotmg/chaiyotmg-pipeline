@@ -33,3 +33,8 @@ jobs:
           unzip poc-nodejs.zip -d poc-nodejs
           echo "====================================================="
           # ls poc-nodejs
+          
+      - name: Clean up workspace
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
