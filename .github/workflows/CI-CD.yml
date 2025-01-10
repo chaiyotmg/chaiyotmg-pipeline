@@ -15,7 +15,7 @@ jobs:
     env:
       USERNAME: ${{ vars.USERNAME }}
       PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      NODEJS_APP_PATH: ${{ vars.NODEJS_APP_PATH }
+      NODEJS_APP_PATH: ${{ vars.NODEJS_APP_PATH }}
     steps:
       - name: Clean up workspace
         run: |
