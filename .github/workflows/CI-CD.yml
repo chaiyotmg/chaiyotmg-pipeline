@@ -18,10 +18,13 @@ jobs:
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
           
-      - uses: actions/checkout@v4
+      - name: Checkout another repository
+        uses: actions/checkout@v2
         with:
-          repository: '${{ vars.USER_NAME }}/poc-nodejs'
-    
+          repository: ${{ vars.USER_NAME }}/poc-nodejs  
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.branch }}
+          
       - name: Download poc-nodejs as ZIP
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
