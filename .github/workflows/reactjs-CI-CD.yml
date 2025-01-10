@@ -29,7 +29,17 @@ jobs:
           path: ${{ vars.REACT_APP_NAME }}
           fetch-depth: 1
           submodules: false
-
+          
+      - name: Install package with npm
+        run: |
+          cd ${{ vars.REACT_APP_PATH }}
+          npm install    
+          
+      - name: Build react app
+        run: |
+          cd ${{ vars.REACT_APP_PATH }}
+          npm run build
+          
       - name: Create dir
         run: |
           if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
@@ -40,11 +50,12 @@ jobs:
       - name: Copy files to target dir
         run: |
           if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
-              sudo cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/* ${{ vars.REACT_APP_PATH }}/
+              sudo cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
               echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
           else
               echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
           fi
+
           
       - name: Restart nginx!
         run: |
