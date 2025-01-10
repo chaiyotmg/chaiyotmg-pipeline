@@ -26,7 +26,7 @@ jobs:
           repository: ${{ vars.USERNAME }}/poc-react-vite
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           ref: ${{ inputs.branch }}
-          path: ${{ vars.REACT_APP_PATH }}
+          path: ${{ vars.REACT_APP_NAME }}
           fetch-depth: 1
           submodules: false
 
