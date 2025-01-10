@@ -16,29 +16,30 @@ jobs:
     steps:
       - name: Clean up workspace
         run: |
-          echo "Cleaning up temporary files..."
-          sudo rm -rf $(pwd)/*
-          sudo rm -rf ${{ vars.REACT_APP_PATH }}/*
+          # echo "Cleaning up temporary files..."
+          # sudo rm -rf $(pwd)/*
+          # sudo rm -rf ${{ vars.REACT_APP_PATH }}/*
+          whoami
           
-      - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ vars.USERNAME }}/poc-react-vite
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          ref: ${{ inputs.branch }}
-          path: ${{ vars.REACT_APP_NAME }}
-          fetch-depth: 1
-          submodules: false
+      # - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: ${{ vars.USERNAME }}/poc-react-vite
+      #     token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+      #     ref: ${{ inputs.branch }}
+      #     path: ${{ vars.REACT_APP_NAME }}
+      #     fetch-depth: 1
+      #     submodules: false
           
-      - name: Install package with npm
-        run: |
-          cd ${{ vars.REACT_APP_PATH }}
-          npm install    
+      # - name: Install package with npm
+      #   run: |
+      #     cd ${{ vars.REACT_APP_PATH }}
+      #     npm install    
           
-      - name: Build react app
-        run: |
-          cd ${{ vars.REACT_APP_PATH }}
-          npm run build
+      # - name: Build react app
+      #   run: |
+      #     cd ${{ vars.REACT_APP_PATH }}
+      #     npm run build
           
       # - name: Create dir
       #   run: |
