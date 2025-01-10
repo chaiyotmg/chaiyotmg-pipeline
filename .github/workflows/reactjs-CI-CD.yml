@@ -33,7 +33,7 @@ jobs:
       - name: Create dir
         run: |
           if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
-              mkdir -p ${{ vars.REACT_APP_PATH }}
+              sudo mkdir -p ${{ vars.REACT_APP_PATH }}
               echo "Directory created: ${{ vars.REACT_APP_PATH }}"
           fi
         
