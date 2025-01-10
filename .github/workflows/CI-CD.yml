@@ -23,10 +23,10 @@ jobs:
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
           
-      - name: Checkout $USERNAME/poc-nodejs repository
+      - name: Checkout ${{ vars.USERNAME }}/poc-nodejs repository
         uses: actions/checkout@v2
         with:
-          repository: $USERNAME/poc-nodejs
+          repository: ${{ vars.USERNAME }}/poc-nodejs
           token: $PERSONAL_ACCESS_TOKEN
           ref: ${{ inputs.branch }}
           path: $NODEJS_APP_NAME
