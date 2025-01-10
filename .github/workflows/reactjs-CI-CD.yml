@@ -16,25 +16,24 @@ jobs:
     steps:
       - name: Clean up workspace
         run: |
-          # echo "Cleaning up temporary files..."
-          # sudo rm -rf $(pwd)/*
-          # sudo rm -rf ${{ vars.REACT_APP_PATH }}/*
-          whoami
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
+          rm -rf ${{ vars.REACT_APP_PATH }}/*
           
-      # - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: ${{ vars.USERNAME }}/poc-react-vite
-      #     token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      #     ref: ${{ inputs.branch }}
-      #     path: ${{ vars.REACT_APP_NAME }}
-      #     fetch-depth: 1
-      #     submodules: false
+      - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ vars.USERNAME }}/poc-react-vite
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ref: ${{ inputs.branch }}
+          path: ${{ vars.REACT_APP_NAME }}
+          fetch-depth: 1
+          submodules: false
           
-      # - name: Install package with npm
-      #   run: |
-      #     cd ${{ vars.REACT_APP_PATH }}
-      #     npm install    
+      - name: Install package with npm
+        run: |
+          cd ${{ vars.REACT_APP_PATH }}
+          npm install    
           
       # - name: Build react app
       #   run: |
@@ -44,14 +43,14 @@ jobs:
       # - name: Create dir
       #   run: |
       #     if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
-      #         sudo mkdir -p ${{ vars.REACT_APP_PATH }}
+      #         mkdir -p ${{ vars.REACT_APP_PATH }}
       #         echo "Directory created: ${{ vars.REACT_APP_PATH }}"
       #     fi
         
       # - name: Copy files to target dir
       #   run: |
       #     if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
-      #         sudo cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
+      #         cp -r $(pwd)/${{ vars.REACT_APP_NAME }}/dist/* ${{ vars.REACT_APP_PATH }}/
       #         echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
       #     else
       #         echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
@@ -59,4 +58,4 @@ jobs:
 
       # - name: Restart nginx!
       #   run: |
-      #     sudo systemctl restart nginx
+      #     systemctl restart nginx
