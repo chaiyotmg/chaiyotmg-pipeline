@@ -27,6 +27,9 @@ jobs:
                -L -o poc-nodejs.zip \
                https://api.github.com/repos/${{ vars.USER_NAME }}/poc-nodejs/zipball/$BRANCH
           pwd
+          echo "====================================================="
           ls -l
-          unzip $(pwd)/poc-nodejs.zip -d $(pwd)/poc-nodejs
+          echo "====================================================="
+          unzip poc-nodejs.zip -d poc-nodejs
+          echo "====================================================="
           # ls poc-nodejs
