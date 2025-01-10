@@ -1,4 +1,4 @@
-name: CI-CD
+name: nodejs-CI-CD
 on:
   workflow_dispatch:
     inputs:
@@ -6,14 +6,12 @@ on:
         description: 'Branch app to pull'
         required: true
         default: 'main'
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
         
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: self-hosted
     steps:
       - name: Clean up workspace
