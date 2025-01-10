@@ -59,3 +59,4 @@ jobs:
           pm2 save
           sleep 2
           curl http://localhost:3000/test
+          sudo systemctl restart nginx
