@@ -1,19 +1,12 @@
-# This is a basic workflow to help you get started with Actions
-
-name: CI
-
-# Controls when the workflow will run
+name: CI-CD
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+    inputs:
+      branch:
+        description: 'Branch to pull'
+        required: true
+        default: 'main'
+        
 jobs:
   # This workflow contains a single job called "build"
   build:
@@ -24,22 +17,15 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
+      
+      - name: Download Repository as ZIP
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          curl -H "Authorization: token $GITHUB_TOKEN" \
+               -L -o repo.zip \
+               https://api.github.com/repos/chaiyodcymg/poc-nodejs/zipball/main
+
+               
       - name: Run my variable
         run: echo "my variable :${{ vars.USER_NAME }}"
-        
-      - name: Run who
-        run: echo "myusername :$(whoami)"
-
-      - name: Run PWD
-        run: pwd
-
-      # Runs a set of commands using the runners shell
-      - name: Run a ls
-        run: |
-          ls -la /home
-
-      - name: Run sleep
-        run: |
-          echo "Waiting for 10 seconds..."
-          sleep 10
-          echo "Done!"
