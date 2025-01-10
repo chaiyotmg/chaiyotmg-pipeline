@@ -24,7 +24,7 @@ jobs:
           BRANCH: ${{ inputs.branch }}
         run: |
           curl -H "Authorization: token $GITHUB_TOKEN" \
-               -L -o poc-nodejs.zip \
+               -L -o poc-nodejs \
                https://api.github.com/repos/${{ vars.USER_NAME }}/poc-nodejs/zipball/$BRANCH
                unzip poc-nodejs.zip -d poc-nodejs
                ls poc-nodejs
