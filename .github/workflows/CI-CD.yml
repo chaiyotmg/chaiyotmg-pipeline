@@ -30,7 +30,6 @@ jobs:
           echo "====================================================="
           ls -l
           echo "====================================================="
-          unzip -v
-          # unzip poc-nodejs.zip -d poc-nodejs
+          unzip poc-nodejs.zip -d poc-nodejs
           echo "====================================================="
           # ls poc-nodejs
