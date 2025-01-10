@@ -50,10 +50,7 @@ jobs:
           
       - name: Install package with npm
         run: |
-          ls -l
-          echo "=============================================================="
-          ls -l ${{ vars.NODEJS_APP_PATH }}
-          # cd ${{ vars.NODEJS_APP_PATH }}
-          # npm install
+          npm cache clean
+          npm install
         
 
