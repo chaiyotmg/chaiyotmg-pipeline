@@ -1,0 +1,51 @@
+name: reactjs-CI-CD
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch app to pull'
+        required: true
+        default: 'main'
+  # push:
+  #   branches:
+  #     - main
+        
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Clean up workspace
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
+          rm -rf ${{ vars.REACT_APP_PATH }}/*
+          
+      - name: Checkout ${{ vars.USERNAME }}/poc-react-vite repository
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ vars.USERNAME }}/poc-react-vite
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ref: ${{ inputs.branch }}
+          path: ${{ vars.REACT_APP_PATH }}
+          fetch-depth: 1
+          submodules: false
+
+      - name: Create dir
+        run: |
+          if [ ! -d "${{ vars.REACT_APP_PATH }}" ]; then
+              mkdir -p ${{ vars.REACT_APP_PATH }}
+              echo "Directory created: ${{ vars.REACT_APP_PATH }}"
+          fi
+        
+      - name: Copy files to target dir
+        run: |
+          if [ -d "${{ vars.REACT_APP_PATH }}" ]; then
+              cp -r $(pwd)/${{ vars.REACT_APP_PATH }}/* ${{ vars.REACT_APP_PATH }}/
+              echo "Files copied to: ${{ vars.REACT_APP_PATH }}"
+          else
+              echo "Dir not found!! : ${{ vars.REACT_APP_PATH }}"
+          fi
+          
+      - name: Restart nginx!
+        run: |
+          sudo systemctl restart nginx
