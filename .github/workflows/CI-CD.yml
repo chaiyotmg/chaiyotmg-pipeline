@@ -15,9 +15,6 @@ jobs:
   build:
     # The type of runner that the job will run on
     runs-on: self-hosted
-    env:
-      NODEJS_APP_PATH: ${{ vars.NODEJS_APP_PATH }}
-      NODEJS_APP_NAME: ${{ vars.NODEJS_APP_NAME }}
     steps:
       - name: Clean up workspace
         run: |
@@ -35,17 +32,17 @@ jobs:
       - name: Create dir
         run: |
           if [ ! -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-              mkdir -p $NODEJS_APP_PATH
-              echo "Directory created: $NODEJS_APP_PATH"
+              mkdir -p ${{ vars.NODEJS_APP_PATH }}
+              echo "Directory created: ${{ vars.NODEJS_APP_PATH }}"
           fi
           
       - name: Copy files to target dir
         run: |
-          if [ -d $NODEJS_APP_PATH ]; then
-              cp * $NODEJS_APP_PATH
-              echo "Files copied to: $NODEJS_APP_PATH"
+          if [ -d "${{ vars.NODEJS_APP_PATH }}" ]; then
+              cp * ${{ vars.NODEJS_APP_PATH }}
+              echo "Files copied to: ${{ vars.NODEJS_APP_PATH }}"
           else
-              echo "Dir not found!! : $NODEJS_APP_PATH"
+              echo "Dir not found!! : ${{ vars.NODEJS_APP_PATH }}"
           fi
           
       - name: Install package with npm
