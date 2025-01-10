@@ -50,7 +50,10 @@ jobs:
           
       - name: Install package with npm
         run: |
-          npm cache clean
           npm install
         
-
+      - name: Start app!
+        run: |
+          pm2 start index.js --name '${{ vars.NODEJS_APP_NAME }}'
+          sleep 2
+          curl http://localhost:3000/test
