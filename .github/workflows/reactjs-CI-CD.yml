@@ -6,9 +6,9 @@ on:
         description: 'Branch app to pull'
         required: true
         default: 'main'
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
         
 jobs:
   build:
