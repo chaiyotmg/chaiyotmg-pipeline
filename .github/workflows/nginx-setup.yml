@@ -20,67 +20,70 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Setup nginx without SSL
-        if: inputs.setupFrontEnd == 'true' && inputs.setupBackEnd == 'true'
         run: |
-          cat <<EOF > /etc/nginx/sites-available/default
-            server { 
-              listen 80;
-              server_name _;
-              root ${{ vars.REACT_APP_PATH }};
-              index index.html;
+          echo "${{ inputs.setupFrontEnd  }}"
+      # - name: Setup nginx without SSL
+      #   if: inputs.setupFrontEnd == 'true' && inputs.setupBackEnd == 'true'
+      #   run: |
+      #     cat <<EOF > /etc/nginx/sites-available/default
+      #       server { 
+      #         listen 80;
+      #         server_name _;
+      #         root ${{ vars.REACT_APP_PATH }};
+      #         index index.html;
           
-              location / {
-                      try_files $uri /index.html;
-              }
+      #         location / {
+      #                 try_files $uri /index.html;
+      #         }
           
-              location /api/ {
-                  proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host $host;
-                  proxy_cache_bypass $http_upgrade;
-              }
-            }
-            EOF
+      #         location /api/ {
+      #             proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
+      #             proxy_http_version 1.1;
+      #             proxy_set_header Upgrade $http_upgrade;
+      #             proxy_set_header Connection 'upgrade';
+      #             proxy_set_header Host $host;
+      #             proxy_cache_bypass $http_upgrade;
+      #         }
+      #       }
+      #       EOF
             
-      - name: Setup nginx without SSL
-        if: inputs.setupFrontEnd == 'true'
-        run: |
-          cat <<EOF > /etc/nginx/sites-available/default
-            server { 
-              listen 80;
-              server_name _;
-              root ${{ vars.REACT_APP_PATH }};
-              index index.html;
-              location / {
-                      try_files $uri /index.html;
-              }
-            }
-            EOF    
+      # - name: Setup nginx without SSL
+      #   if: inputs.setupFrontEnd == 'true'
+      #   run: |
+      #     cat <<EOF > /etc/nginx/sites-available/default
+      #       server { 
+      #         listen 80;
+      #         server_name _;
+      #         root ${{ vars.REACT_APP_PATH }};
+      #         index index.html;
+      #         location / {
+      #                 try_files $uri /index.html;
+      #         }
+      #       }
+      #       EOF    
             
-      - name: Setup nginx without SSL
-        if: inputs.setupBackEnd == 'true'
-        run: |
-          cat <<EOF > /etc/nginx/sites-available/default
-            server { 
-              listen 80;
-              server_name _;
+      # - name: Setup nginx without SSL
+      #   if: inputs.setupBackEnd == 'true'
+      #   run: |
+      #     cat <<EOF > /etc/nginx/sites-available/default
+      #       server { 
+      #         listen 80;
+      #         server_name _;
           
-              location /api/ {
-                  proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
-                  proxy_http_version 1.1;
-                  proxy_set_header Upgrade $http_upgrade;
-                  proxy_set_header Connection 'upgrade';
-                  proxy_set_header Host $host;
-                  proxy_cache_bypass $http_upgrade;
-              }
-            }
-            EOF
+      #         location /api/ {
+      #             proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
+      #             proxy_http_version 1.1;
+      #             proxy_set_header Upgrade $http_upgrade;
+      #             proxy_set_header Connection 'upgrade';
+      #             proxy_set_header Host $host;
+      #             proxy_cache_bypass $http_upgrade;
+      #         }
+      #       }
+      #       EOF
 
             
-      - name: Restart nginx
-        if: inputs.setupFrontEnd == 'true' || inputs.setupBackEnd == 'true'
-        run: |
-          sudo systemctl restart nginx
+      # - name: Restart nginx
+      #   if: inputs.setupFrontEnd == 'true' || inputs.setupBackEnd == 'true'
+      #   run: |
+      #     sudo systemctl restart nginx
           
