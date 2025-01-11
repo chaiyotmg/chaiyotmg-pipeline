@@ -20,7 +20,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupFrontEnd == 'true' && inputs.setupBackEnd == 'true' }}
+        if: inputs.setupFrontEnd == 'true' && inputs.setupBackEnd == 'true'
         run: |
           cat <<EOF > /etc/nginx/sites-available/default
             server { 
@@ -45,7 +45,7 @@ jobs:
             EOF
             
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupFrontEnd == 'true' }}
+        if: inputs.setupFrontEnd == 'true'
         run: |
           cat <<EOF > /etc/nginx/sites-available/default
             server { 
@@ -60,7 +60,7 @@ jobs:
             EOF    
             
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupBackEnd == 'true' }}
+        if: inputs.setupBackEnd == 'true'
         run: |
           cat <<EOF > /etc/nginx/sites-available/default
             server { 
@@ -80,7 +80,7 @@ jobs:
 
             
       - name: Restart nginx
-        if: ${{ inputs.setupFrontEnd == 'true' || inputs.setupBackEnd == 'true' }}
+        if: inputs.setupFrontEnd == 'true' || inputs.setupBackEnd == 'true'
         run: |
           sudo systemctl restart nginx
           
