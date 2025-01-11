@@ -26,8 +26,7 @@ jobs:
             server { 
               listen 80;
               server_name _;
-          
-              root ${{ REACT_APP_PATH }};
+              root ${{ vars.REACT_APP_PATH }};
               index index.html;
           
               location / {
@@ -35,7 +34,7 @@ jobs:
               }
           
               location /api/ {
-                  proxy_pass http://localhost:${{ NODEJS_APP_PORT }}/;
+                  proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;
                   proxy_set_header Connection 'upgrade';
@@ -52,7 +51,7 @@ jobs:
             server { 
               listen 80;
               server_name _;
-              root ${{ REACT_APP_PATH }};
+              root ${{ vars.REACT_APP_PATH }};
               index index.html;
               location / {
                       try_files $uri /index.html;
@@ -69,7 +68,7 @@ jobs:
               server_name _;
           
               location /api/ {
-                  proxy_pass http://localhost:${{ NODEJS_APP_PORT }}/;
+                  proxy_pass http://localhost:${{ vars.NODEJS_APP_PORT }}/;
                   proxy_http_version 1.1;
                   proxy_set_header Upgrade $http_upgrade;
                   proxy_set_header Connection 'upgrade';
