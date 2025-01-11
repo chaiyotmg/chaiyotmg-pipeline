@@ -54,6 +54,7 @@ jobs:
       - name: Start app!
         run: |
           pm2 delete all || true
+          sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u chaiyot_mg --hp /home/chaiyot_mg
           pm2 start ${{ vars.NODEJS_APP_PATH }}/index.js --name '${{ vars.NODEJS_APP_NAME }}'
           pm2 save
           sudo systemctl restart nginx
