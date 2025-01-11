@@ -55,6 +55,6 @@ jobs:
         run: |
           pm2 kill
           pm2 start ${{ vars.NODEJS_APP_PATH }}/index.js --name '${{ vars.NODEJS_APP_NAME }}'
-          sleep 2
+          pm2 save
           curl http://localhost:3000/test
           sudo systemctl restart nginx
