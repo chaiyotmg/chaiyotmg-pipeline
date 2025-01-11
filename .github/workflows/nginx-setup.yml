@@ -1,0 +1,50 @@
+name: nginx-setup
+on:
+  workflow_dispatch:
+    inputs:
+      includeTests:
+        description: 'Run tests?' # Checkbox ตัวที่ 1
+        required: true
+        default: 'false'
+        type: boolean
+      includeLint:
+        description: 'Run lint checks?' # Checkbox ตัวที่ 2
+        required: true
+        default: 'false'
+        type: boolean
+#   push:
+#     branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Setup nginx without SSL
+        run: |
+          cat <<EOF > /etc/nginx/sites-available/default
+            server { 
+              listen 80;
+              server_name _;
+          
+              root ${{ REACT_APP_PATH }};
+              index index.html;
+          
+              location / {
+                      try_files $uri /index.html;
+              }
+          
+              location /api/ {
+                  proxy_pass http://localhost:${{ NODEJS_APP_PORT }}/;
+                  proxy_http_version 1.1;
+                  proxy_set_header Upgrade $http_upgrade;
+                  proxy_set_header Connection 'upgrade';
+                  proxy_set_header Host $host;
+                  proxy_cache_bypass $http_upgrade;
+              }
+            }
+            EOF
+            
+      - name: Restart nginx
+        run: |
+          sudo systemctl restart nginx
+          
