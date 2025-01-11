@@ -42,21 +42,21 @@ jobs:
                   proxy_cache_bypass $http_upgrade;
               }
             }
-            EOF
+          EOF
             
       - name: Setup nginx without SSL
         if: ${{ inputs.setupFrontEnd == true }}
         run: |
-          sudo cat <<EOF > /etc/nginx/sites-available/default
-            server { 
-              listen 80;
-              server_name _;
-              root ${{ vars.REACT_APP_PATH }};
-              index index.html;
-              location / {
-                      try_files $uri /index.html;
+            cat <<EOF > /etc/nginx/sites-available/default
+              server { 
+                listen 80;
+                server_name _;
+                root ${{ vars.REACT_APP_PATH }};
+                index index.html;
+                location / {
+                        try_files \$uri /index.html;
+                }
               }
-            }
             EOF    
             
       - name: Setup nginx without SSL
