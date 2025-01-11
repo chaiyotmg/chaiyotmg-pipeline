@@ -47,7 +47,7 @@ jobs:
       - name: Setup nginx without SSL
         if: ${{ inputs.setupFrontEnd == true }}
         run: |
-          cat <<EOF > /etc/nginx/sites-available/default
+          sudo cat <<EOF > /etc/nginx/sites-available/default
             server { 
               listen 80;
               server_name _;
