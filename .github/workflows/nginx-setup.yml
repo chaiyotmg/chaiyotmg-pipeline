@@ -44,7 +44,7 @@ jobs:
           EOF'
             
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupFrontEnd == true }}
+        if: ${{ inputs.setupFrontEnd == true  && inputs.setupBackEnd == false }}
         run: |
             sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
               server { 
@@ -59,7 +59,7 @@ jobs:
             EOF'    
             
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupBackEnd == true }}
+        if: ${{ inputs.setupBackEnd == true && inputs.setupFrontEnd == false }}
         run: |
           sudo bash -c 'cat <<EOF > /etc/nginx/sites-available/default
             server { 
