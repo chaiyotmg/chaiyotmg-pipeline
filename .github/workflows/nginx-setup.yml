@@ -81,6 +81,7 @@ jobs:
 
             
       - name: Restart nginx
+        if: ${{ inputs.setupFrontEnd == 'true' || inputs.setupBackEnd == 'true' }}
         run: |
           sudo systemctl restart nginx
           
