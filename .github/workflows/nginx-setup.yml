@@ -20,7 +20,7 @@ jobs:
     runs-on: self-hosted
     steps:
       - name: Setup nginx without SSL
-        if: ${{ inputs.setupFrontEnd == 'true' }}
+        if: ${{ inputs.setupFrontEnd == true }}
         run: |
           echo "${{ inputs.setupFrontEnd  }}"
       # - name: Setup nginx without SSL
