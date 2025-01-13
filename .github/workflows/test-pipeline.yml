@@ -21,4 +21,4 @@ jobs:
           
       - name: Run a echo
         run: |
-          echo "ENV : $PAC_ENV"
+          echo "ENV : ${{ secrets.PERSONAL_ACCESS_TOKEN }}"
