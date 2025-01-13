@@ -15,8 +15,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
-      - name: Run a multi-line script
+      - name: Run a add env
         run: |
           echo "PAC_ENV=Hello, GitHub Actions!" >> $GITHUB_ENV
-          echo "ENV: $PAC_ENV"
+          
+      - name: Run a echo
+        run: |
+          echo "ENV : $PAC_ENV"
