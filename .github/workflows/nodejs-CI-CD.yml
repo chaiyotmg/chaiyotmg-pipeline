@@ -53,8 +53,7 @@ jobs:
         
       - name: Start app!
         run: |
-          # pm2 delete all || true
-          pm2 kill
+          pm2 delete all || true
           pm2 start ${{ vars.NODEJS_APP_PATH }}/index.js --name '${{ vars.NODEJS_APP_NAME }}'
           pm2 save
           sudo systemctl restart nginx
