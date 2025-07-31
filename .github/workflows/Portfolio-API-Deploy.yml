@@ -1,4 +1,4 @@
-name: GO Portfolio - Deploy
+name: Portfolio API - Deploy
 on:
   workflow_dispatch:
     inputs:
@@ -37,7 +37,7 @@ jobs:
 
       - name: Create dir
         run: |
-          ls -l
+          ls -la ${{ inputs.app-name }}
       
       # - name: Execute remote SSH commands using password
       #   uses: appleboy/ssh-action@v1
