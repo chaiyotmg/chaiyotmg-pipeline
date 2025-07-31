@@ -28,7 +28,7 @@ jobs:
       - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
         uses: actions/checkout@v2
         with:
-          repository: ${{ vars.USERNAME }}/poc-nodejs
+          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           ref: ${{ inputs.branch }}
           path: ${{ inputs.app-name }}
