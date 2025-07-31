@@ -27,7 +27,7 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            whoami
+            eho "pwd: $(pwd)"
             ls -al
 
           
