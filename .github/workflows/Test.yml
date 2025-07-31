@@ -9,6 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get current directory using 'cd'
-        run: cd
-        shell: cmd
+      - name: PWD
+        run: |
+          pwd
+          
+      - name: ls
+        run: |
+          ls -l
