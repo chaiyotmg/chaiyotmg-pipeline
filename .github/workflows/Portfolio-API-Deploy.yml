@@ -55,6 +55,7 @@ jobs:
         with:
           files: ${{ inputs.app-name }}-app.zip
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          tag_name: ${{ github.ref_name }}
           
       # - name: Execute remote SSH commands using password
       #   uses: appleboy/ssh-action@v1
