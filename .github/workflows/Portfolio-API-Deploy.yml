@@ -38,7 +38,7 @@ jobs:
       - name: Build App...
         run: |
           cd ${{ inputs.app-name }}
-          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }} ./cmd/server/main.go
+          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ../${{ inputs.app-name }} ./cmd/server/main.go
 
       - name: Build App...
         run: |
