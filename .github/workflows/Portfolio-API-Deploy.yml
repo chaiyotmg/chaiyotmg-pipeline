@@ -35,7 +35,7 @@ jobs:
           fetch-depth: 1
           submodules: false
 
-      - name: Build App...
+      - name: Build app...
         run: |
           cd ${{ inputs.app-name }}
           GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }}-app ./cmd/server/main.go
@@ -45,12 +45,12 @@ jobs:
         run: |
           ls -la
 
-      # - name: 'Upload App to Artifact'
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: backend-app
-      #     path: ${{ inputs.app-name }}
-      #     retention-days: 7
+      - name: 'Upload app to artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-app
+          path: ${{ inputs.app-name }}-app
+          retention-days: 7
     
       # - name: Execute remote SSH commands using password
       #   uses: appleboy/ssh-action@v1
