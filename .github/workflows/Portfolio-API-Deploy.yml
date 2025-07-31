@@ -12,6 +12,10 @@ on:
         type: choice
         options:
           - 'go-portfolio-api'
+      tag:
+        description: 'Tag or version'
+        required: true
+        default: 'v0.1.0'
   # push:
   #   branches:
   #     - main
@@ -53,9 +57,10 @@ jobs:
       - name: Upload app to github packages
         uses: softprops/action-gh-release@v2
         with:
+          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
           files: ${{ inputs.app-name }}-app.zip
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ inputs.tag }}
           
       # - name: Execute remote SSH commands using password
       #   uses: appleboy/ssh-action@v1
