@@ -23,7 +23,7 @@ jobs:
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.BACKEND_SERVER_HOST }}
-          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          username: ${{ vars.BACKEND_SERVER_USERNAME }}
           key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
