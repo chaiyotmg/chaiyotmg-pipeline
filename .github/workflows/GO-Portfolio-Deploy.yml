@@ -6,6 +6,12 @@ on:
         description: 'Branch app to pull'
         required: true
         default: 'main'
+      app-name:
+        description: 'App name to deploy'
+        required: true
+        type: choice
+        options:
+          - 'go-portfolio-api'
   # push:
   #   branches:
   #     - main
@@ -18,28 +24,34 @@ jobs:
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
-
-      - name: Execute remote SSH commands using password
-        uses: appleboy/ssh-action@v1
+          
+      - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
+        uses: actions/checkout@v2
         with:
-          host: ${{ secrets.BACKEND_SERVER_HOST }}
-          username: ${{ vars.BACKEND_SERVER_USERNAME }}
-          key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
-          port: ${{ secrets.BACKEND_SERVER_PORT }}
-          script: |
-            echo "Current directory is: $(pwd)"
-            ls -al
+          repository: ${{ vars.USERNAME }}/poc-nodejs
+          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          ref: ${{ inputs.branch }}
+          path: ${{ inputs.app-name }}
+          fetch-depth: 1
+          submodules: false
+
+      - name: Create dir
+        run: |
+          ls -l
+      
+      # - name: Execute remote SSH commands using password
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ vars.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       echo "Current directory is: $(pwd)"
+      #       ls -al
 
           
-      # - name: Checkout ${{ vars.USERNAME }}/poc-nodejs repository
-      #   uses: actions/checkout@v2
-      #   with:
-      #     repository: ${{ vars.USERNAME }}/poc-nodejs
-      #     token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      #     ref: ${{ inputs.branch }}
-      #     path: ${{ vars.NODEJS_APP_NAME }}
-      #     fetch-depth: 1
-      #     submodules: false
+
 
       # - name: Create dir
       #   run: |
