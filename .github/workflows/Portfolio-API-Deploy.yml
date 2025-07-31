@@ -39,8 +39,10 @@ jobs:
         run: |
           cd ${{ inputs.app-name }}
           GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }} ./cmd/server/main.go
+          ls -la
           cd ..
-          mv ./${{ inputs.app-name }}/${{ inputs.app-name }} ${{ inputs.app-name }}
+          ls -la
+          # mv ./${{ inputs.app-name }}/${{ inputs.app-name }} ${{ inputs.app-name }}
 
       - name: List files
         run: |
