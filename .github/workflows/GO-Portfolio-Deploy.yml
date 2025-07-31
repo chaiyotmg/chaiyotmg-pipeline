@@ -27,7 +27,7 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            eho "pwd: $(pwd)"
+            echo "Current directory is: $(pwd)"
             ls -al
 
           
