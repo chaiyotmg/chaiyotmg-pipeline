@@ -35,10 +35,22 @@ jobs:
           fetch-depth: 1
           submodules: false
 
-      - name: Create dir
+      - name: Build App...
         run: |
-          ls -la ${{ inputs.app-name }}
-      
+          cd ${{ inputs.app-name }}
+          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }} ./cmd/server/main.go
+
+      - name: Build App...
+        run: |
+          ls -la
+
+      - name: 'Upload App to Artifact'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-app
+          path: ${{ inputs.app-name }}
+          retention-days: 7
+    
       # - name: Execute remote SSH commands using password
       #   uses: appleboy/ssh-action@v1
       #   with:
