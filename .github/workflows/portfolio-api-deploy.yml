@@ -17,10 +17,9 @@ on:
         required: true
         default: 'v0.1.0'
       build_app:
-        description: 'Run build step?'
+        description: 'Not run build step?'
         type: boolean
-        required: true
-        default: true
+        default: false
   # push:
   #   branches:
   #     - main
@@ -35,7 +34,7 @@ jobs:
           rm -rf $(pwd)/*
           
       - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
-        if: ${{ github.event.inputs.build_app == true }}
+        if: ${{ !github.event.inputs.build_app }}
         uses: actions/checkout@v2
         with:
           repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
@@ -46,20 +45,20 @@ jobs:
           submodules: false
 
       - name: Build app...
-        if: ${{ github.event.inputs.build_app == true }}
+        if: ${{ !github.event.inputs.build_app }}
         run: |
           cd ${{ inputs.app-name }}
           GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }}-app ./cmd/server/main.go
           mv ${{ inputs.app-name }}-app ../${{ inputs.app-name }}-app
 
       - name: Create zip file
-        if: ${{ github.event.inputs.build_app == true }}
+        if: ${{ !github.event.inputs.build_app }}
         run: |
           zip ${{ inputs.app-name }}-app.zip ${{ inputs.app-name }}-app
           echo "Created ${{ inputs.app-name }}-app.zip"
     
       - name: Upload app to github packages
-        if: ${{ github.event.inputs.build_app == true }}
+        if: ${{ !github.event.inputs.build_app }}
         uses: softprops/action-gh-release@v2
         with:
           repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
@@ -68,14 +67,13 @@ jobs:
           tag_name: ${{ inputs.tag }}
 
       - name: Download github packages
-        if: ${{ github.event.inputs.build_app != true }}
+        if: ${{ github.event.inputs.build_app }}
         uses: robinraju/release-downloader@v1
         with:
           repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
           tag: ${{ inputs.tag }}
           fileName: ${{ inputs.app-name }}-app.zip
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
-
 
       - name: Check if zip file exists
         run: |
@@ -92,73 +90,11 @@ jobs:
         run: |
           ls -la
 
-      - name: Unzip file
-        run: |
-          unzip -j ./${{ inputs.app-name }}-app.zip
-
-
-      # - name: Setup SSH
+      # - name: Unzip file
       #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-      #     ssh-keyscan -H ${{ secrets.BACKEND_SERVER_HOST }} >> ~/.ssh/known_hosts
-
-
-      # - name: List files
-      #   run: |
-      #     cat ~/.ssh/known_hosts
-
-      - name: current dir 
-        run: |
-          echo "${{ github.workspace }}"
-          echo "hello pack" > pack.txt
-
-      - name: List files
-        run: |
-          ls -la
+      #     unzip -j ./${{ inputs.app-name }}-app.zip
 
       - name: Upload app to server
         run: |
-          scp -r ./${{ inputs.app-name }}-app ${{ vars.BACKEND_SERVER_USERNAME }}@${{ vars.BACKEND_SERVER_HOST }}:/home/go_portfolio_api_app_user
+          scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ vars.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
             
-      # - name: Upload app to server
-      #   run: |
-      #     scp -i ./ssh_private_key ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.BACKEND_SERVER_USERNAME }}/ 
-     
-      # - name: Upload Files
-      #   uses: appleboy/scp-action@v1
-      #   with:
-      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
-      #     username: ${{ vars.BACKEND_SERVER_USERNAME }}
-      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
-      #     port: ${{ secrets.PORT }}
-      #     source: "${{ github.workspace }}/go-portfolio-api-app.zip"
-      #     target: /home/ubuntu/go-portfolio-api-app.zip
-
-      # - name: Upload app to server
-      #   uses: wlixcc/SFTP-Deploy-Action@v1.2.6
-      #   with:
-      #     username: '${{ vars.BACKEND_SERVER_USERNAME }}'
-      #     server: '${{ secrets.BACKEND_SERVER_HOST }}'
-      #     ssh_private_key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
-      #     local_path: './${{ inputs.app-name }}-app/${{ inputs.app-name }}-app'
-      #     remote_path: '/home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ inputs.app-name }}-app'
-      #     rsyncArgs: '--exclude=node_modules --exclude=.git --exclude=*.log'
-      #     sftpArgs: '-o ConnectTimeout=5'
-
-      # - name: Create dir
-      #   run: |
-      #     if [ ! -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-      #         mkdir -p ${{ vars.NODEJS_APP_PATH }}
-      #         echo "Directory created: ${{ vars.NODEJS_APP_PATH }}"
-      #     fi
-        
-      # - name: Copy files to target dir
-      #   run: |
-      #     if [ -d "${{ vars.NODEJS_APP_PATH }}" ]; then
-      #         cp -r $(pwd)/${{ vars.NODEJS_APP_NAME }}/* ${{ vars.NODEJS_APP_PATH }}/
-      #         echo "Files copied to: ${{ vars.NODEJS_APP_PATH }}"
-      #     else
-      #         echo "Dir not found!! : ${{ vars.NODEJS_APP_PATH }}"
-      #     fi
