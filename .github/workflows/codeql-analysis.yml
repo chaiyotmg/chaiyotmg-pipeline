@@ -39,10 +39,11 @@ jobs:
       run: |
         ls -la
 
-    # - name: Initialize CodeQL
-    #   uses: github/codeql-action/init@v3
-    #   with:
-    #     languages: go
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        db-location: '${{ github.runner_temp }}/${{ inputs.app-name }}'
+        languages: go
 
-    # - name: Perform CodeQL Analysis
-    #   uses: github/codeql-action/analyze@v3
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
