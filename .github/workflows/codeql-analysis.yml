@@ -42,7 +42,7 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
-        db-location: '${{ github.runner_temp }}/${{ inputs.app-name }}'
+        db-location: '${{ inputs.app-name }}'
         languages: go
 
     - name: Perform CodeQL Analysis
