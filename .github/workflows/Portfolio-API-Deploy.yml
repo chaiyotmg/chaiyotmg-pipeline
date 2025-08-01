@@ -16,6 +16,11 @@ on:
         description: 'Tag or version'
         required: true
         default: 'v0.1.0'
+      build_app:
+        description: 'Do you want to run the build step?'
+        type: boolean
+        required: true
+        default: true
   # push:
   #   branches:
   #     - main
@@ -40,21 +45,20 @@ jobs:
           submodules: false
 
       - name: Build app...
+        if: ${{ github.event.inputs.build_app == true }}
         run: |
           cd ${{ inputs.app-name }}
           GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }}-app ./cmd/server/main.go
           mv ${{ inputs.app-name }}-app ../${{ inputs.app-name }}-app
 
-      - name: List files
-        run: |
-          ls -la
-
       - name: Create archive app
+        if: ${{ github.event.inputs.build_app == true }}
         run: |
           zip ${{ inputs.app-name }}-app.zip ${{ inputs.app-name }}-app
           echo "Created ${{ inputs.app-name }}-app.zip"
     
       - name: Upload app to github packages
+        if: ${{ github.event.inputs.build_app == true }}
         uses: softprops/action-gh-release@v2
         with:
           repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
@@ -63,6 +67,7 @@ jobs:
           tag_name: ${{ inputs.tag }}
 
       - name: Download github packages
+        if: ${{ github.event.inputs.build_app == false }}
         uses: robinraju/release-downloader@v1
         with:
           repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
@@ -72,17 +77,22 @@ jobs:
           dest: '.' 
 
       - name: Check if file exists
+        if: ${{ github.event.inputs.build_app == false }}
         run: |
           FILE_PATH="./${{ inputs.app-name }}-app.zip"
           if [ -f "$FILE_PATH" ]; then
             echo "✅ File '$FILE_PATH' found successfully!"
-            ls -lh "$FILE_PATH" # แสดงข้อมูลไฟล์
+            ls -lh "$FILE_PATH"
           else
             echo "❌ Error: File '$FILE_PATH' not found!"
-            exit 1 # ทำให้ step นี้ fail
+            exit 1
           fi     
+
+      - name: List files
+        run: |
+          ls -la
           
-      # - name: Execute remote SSH commands using password
+      # - name: Remote SSH Server (Stop App)
       #   uses: appleboy/ssh-action@v1
       #   with:
       #     host: ${{ secrets.BACKEND_SERVER_HOST }}
@@ -90,6 +100,7 @@ jobs:
       #     key: ${{ secrets.BACKEND_SERVER_SECRETKEY }}
       #     port: ${{ secrets.BACKEND_SERVER_PORT }}
       #     script: |
+      #       cd app
       #       echo "Current directory is: $(pwd)"
       #       ls -al
 
