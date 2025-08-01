@@ -1,4 +1,4 @@
-name: Portfolio API - Deploy
+name: Portfolio Web Application - Deploy
 on:
   workflow_dispatch:
     inputs:
@@ -11,7 +11,7 @@ on:
         required: true
         type: choice
         options:
-          - 'go-portfolio-api'
+          - 'react-portfolio-web'
       tag:
         description: 'Tag or version'
         required: true
@@ -81,11 +81,7 @@ jobs:
           else
             echo "❌ Error: File '$FILE_PATH' not found!"
             exit 1
-          fi
-
-      - name: Build ENV file
-        run: |
-          echo "${{ secrets.GO_ENVIRONMENT_VARIABLE }}" > .env
+          fi  
 
       - name: List files
         run: |
@@ -95,18 +91,7 @@ jobs:
       #   run: |
       #     unzip -j ./${{ inputs.app-name }}-app.zip
 
-      - name: Upload artifactory to server
+      - name: Upload app to server
         run: |
-          scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-          scp -r .env ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-
-      - name: Unzip file
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.BACKEND_SERVER_HOST }}
-          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
-          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
-          port: ${{ secrets.BACKEND_SERVER_PORT }}
-          script: |
-            whoami
-            ls -al
+          scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ vars.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+            
