@@ -1,8 +1,18 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch app to pull'
+        required: true
+        default: 'main'
+      app-name:
+        description: 'App name to deploy'
+        required: true
+        type: choice
+        options:
+          - 'go-portfolio-api'
 
 jobs:
   analyze:
@@ -15,15 +25,24 @@ jobs:
       contents: read # ต้องการสิทธิ์ในการอ่านเนื้อหาของ repository
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4 # ดึงโค้ดจาก repository ของคุณ
-
-    # เริ่มต้นการตั้งค่า CodeQL
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
+    - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
+      uses: actions/checkout@v2
       with:
-        languages: go
+        repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
+        token: ${{ secrets.REPO_ACCESS_TOKEN }}
+        ref: ${{ inputs.branch }}
+        path: ${{ inputs.app-name }}
+        fetch-depth: 1
+        submodules: false
 
-    # สร้างฐานข้อมูล CodeQL และรันการวิเคราะห์
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
+    - name: List files
+      run: |
+        ls -la
+
+    # - name: Initialize CodeQL
+    #   uses: github/codeql-action/init@v3
+    #   with:
+    #     languages: go
+
+    # - name: Perform CodeQL Analysis
+    #   uses: github/codeql-action/analyze@v3
