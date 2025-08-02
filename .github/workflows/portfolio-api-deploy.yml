@@ -6,7 +6,7 @@ on:
         description: 'Branch app to pull'
         required: true
         default: 'main'
-      app-name:
+      app_name:
         description: 'App name to deploy'
         required: true
         type: choice
@@ -30,51 +30,51 @@ jobs:
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
           
-      - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
-        if: ${{ !github.event.inputs.build_app }}
+      - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app_name }} repository
+        if: ${{ inputs.build_app == false }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
+          repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           ref: ${{ inputs.branch }}
-          path: ${{ inputs.app-name }}
+          path: ${{ inputs.app_name }}
           fetch-depth: 1
           submodules: false
 
       - name: Build app...
-        if: ${{ !github.event.inputs.build_app }}
+        if: ${{ inputs.build_app == false }}
         run: |
-          cd ${{ inputs.app-name }}
-          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }}-app ./cmd/server/main.go
-          mv ${{ inputs.app-name }}-app ../${{ inputs.app-name }}-app
+          cd ${{ inputs.app_name }}
+          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app_name }}-app ./cmd/server/main.go
+          mv ${{ inputs.app_name }}-app ../${{ inputs.app_name }}-app
 
       - name: Create zip file
-        if: ${{ !github.event.inputs.build_app }}
+        if: ${{ inputs.build_app == false }}
         run: |
-          zip ${{ inputs.app-name }}-app.zip ${{ inputs.app-name }}-app
-          echo "Created ${{ inputs.app-name }}-app.zip"
+          zip ${{ inputs.app_name }}-app.zip ${{ inputs.app_name }}-app
+          echo "Created ${{ inputs.app_name }}-app.zip"
     
       - name: Upload app to github packages
-        if: ${{ !github.event.inputs.build_app }}
+        if: ${{ inputs.build_app == false }}
         uses: softprops/action-gh-release@v2
         with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
-          files: ${{ inputs.app-name }}-app.zip
+          repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
+          files: ${{ inputs.app_name }}-app.zip
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           tag_name: ${{ inputs.tag }}
 
       - name: Download github packages
-        if: ${{ github.event.inputs.build_app }}
+        if: ${{ inputs.build_app == true }}
         uses: robinraju/release-downloader@v1
         with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
+          repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
           tag: ${{ inputs.tag }}
-          fileName: ${{ inputs.app-name }}-app.zip
+          fileName: ${{ inputs.app_name }}-app.zip
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
 
       - name: Check if zip file exists
         run: |
-          FILE_PATH="./${{ inputs.app-name }}-app.zip"
+          FILE_PATH="./${{ inputs.app_name }}-app.zip"
           if [ -f "$FILE_PATH" ]; then
             echo "✅ File '$FILE_PATH' found successfully!"
             ls -lh "$FILE_PATH"
@@ -91,16 +91,7 @@ jobs:
         run: |
           ls -la
 
-      # - name: Unzip file
-      #   run: |
-      #     unzip -j ./${{ inputs.app-name }}-app.zip
-
-      - name: Upload artifactory to server
-        run: |
-          scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-          scp -r .env ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-
-      - name: Unzip file
+      - name: clear app workspace on app server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.BACKEND_SERVER_HOST }}
@@ -108,5 +99,23 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            whoami
+            cd /home/${{ vars.GO_PORTFOLIO_API_USER}}
+            rm ./${{ inputs.app_name }}-app .env
+
+      - name: Upload file to app server
+        run: |
+          scp -r ./${{ inputs.app_name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+          scp -r .env ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+
+      - name: Unzip on app server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_SERVER_HOST }}
+          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          script: |
+            cd /home/${{ vars.GO_PORTFOLIO_API_USER}}
+            unzip -j ./${{ inputs.app_name }}-app.zip
+            rm ./${{ inputs.app_name }}-app.zip
             ls -al

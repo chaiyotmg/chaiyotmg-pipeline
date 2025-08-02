@@ -1,0 +1,53 @@
+name: Debug Pipeline
+on:
+  workflow_dispatch:
+    inputs:
+      server_name:
+        description: 'Select Target Server'
+        required: true
+        type: choice
+        options:
+          - 'Runner'
+          - 'Back-End-Server'
+          - 'Front-End-Server'
+        default: 'Runner'
+      command:
+        description: 'Enter Linux command to execute'
+        required: true
+        default: ''
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Clean up workspace
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
+
+      - name:  Execute command on Runner Server
+        if: ${{ inputs.server_name == 'Runner' }}
+        run: |
+            ${{ inputs.command }}
+
+      - name: Execute command on Back-End Server
+        uses: appleboy/ssh-action@v1.0.3
+        if: ${{ inputs.server_name == 'Back-End-Server' }}
+        with:
+          host: ${{ secrets.BACKEND_SERVER_HOST }}
+          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          script: |
+            ${{ inputs.command }}
+
+      - name: Execute command on Back-End Server
+        uses: appleboy/ssh-action@v1.0.3
+        if: ${{ inputs.server_name == 'Front-End-Server' }}
+        with:
+          host: ${{ secrets.FRONTEND_SERVER_HOST }}
+          username: ${{ secrets.FRONTEND_SERVER_USERNAME }}
+          key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.FRONTEND_SERVER_PORT }}
+          script: |
+            ${{ inputs.command }}
