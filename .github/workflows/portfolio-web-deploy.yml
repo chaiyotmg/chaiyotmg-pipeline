@@ -1,4 +1,4 @@
-name: Portfolio Web Application - Deploy
+name: Portfolio Web - Deploy
 on:
   workflow_dispatch:
     inputs:
