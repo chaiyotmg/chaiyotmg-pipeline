@@ -41,7 +41,7 @@ jobs:
           script: |
             ${{ inputs.command }}
 
-      - name: Execute command on Back-End Server
+      - name: Execute command on Front-End Server
         uses: appleboy/ssh-action@v1.0.3
         if: ${{ inputs.server_name == 'Front-End-Server' }}
         with:

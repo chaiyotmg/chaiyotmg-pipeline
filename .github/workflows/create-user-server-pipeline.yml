@@ -32,12 +32,11 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            if [ "$EUID" -ne 0 ]; then
-              echo "must run with root"
-              exit 1
-            fi
+            APP_USER="${{ inputs.username}}_user"        
+            APP_GROUP="${{ inputs.username}}_group" 
 
-      - name: Execute command on Back-End Server
+
+      - name: Execute command on Front-End Server
         uses: appleboy/ssh-action@v1.0.3
         if: ${{ inputs.server_name == 'Front-End-Server' }}
         with:
@@ -46,10 +45,58 @@ jobs:
           key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.FRONTEND_SERVER_PORT }}
           script: |
-            if [ "$EUID" -ne 0 ]; then
-              echo "must run with root"
+            APP_USER="${{ inputs.username}}_user"        
+            APP_GROUP="${{ inputs.username}}_group"
+            APP_HOME_DIR="/home/${APP_USER}"
+
+            # 1. Create a Group for the application (if one doesn't already exist).
+            if ! sudo getent group "${APP_GROUP}" > /dev/null; then
+              sudo groupadd "${APP_GROUP}"
+              echo "Create group: ${APP_GROUP}"
+            else
+              echo "group: ${APP_GROUP} already exists"
               exit 1
             fi
+
+            # 2. Create a user for the application (if you don't have one yet).
+            if ! id -u "${APP_USER}" > /dev/null 2>&1; then
+              sudo useradd \
+                --system \
+                --shell /sbin/nologin \
+                --no-create-home \
+                --home-dir "${APP_HOME_DIR}" \
+                --gid "${APP_GROUP}" \
+                "${APP_USER}"
+              echo "Created User: ${APP_USER}"
+              echo "Home Directory: ${APP_HOME_DIR}"
+            else
+              echo "User ${APP_USER} already exists"
+              exit 1
+            fi
+
+            # 3. Create a Home Directory and subdirectories.
+            if [ ! -d "${APP_HOME_DIR}" ]; then
+              sudo mkdir -p "${APP_HOME_DIR}"
+              echo "Created Directory: ${APP_HOME_DIR}"
+            fi
+
+            # 4. Set Ownership and Permissions
+            # Assign the application's user/group ownership to the home directory and the log directory.
+            if ! sudo chown -R "${APP_USER}:${APP_GROUP}" "${APP_HOME_DIR}"; then
+              echo "❌ chown failed. Permission denied or invalid path."
+              exit 1
+            else
+              echo "Assign ownership of ${APP_USER}:${APP_GROUP} to ${APP_HOME_DIR}"
+            fi
+
+            if ! sudo chmod -R 775 "${APP_HOME_DIR}"; then
+              echo "❌ chmod failed. Permission denied or invalid path."
+              exit 1
+            else
+              echo "Set permissions to 775 for ${APP_HOME_DIR}"
+            fi
+
+
 
       - name: Clean up runner workspace
         run: |
