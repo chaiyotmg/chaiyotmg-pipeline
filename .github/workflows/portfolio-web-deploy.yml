@@ -48,6 +48,7 @@ jobs:
           yarn install
 
       - name: Setup ENV file
+        if: ${{ inputs.build_app == false }}
         run: |
           cd ${{ inputs.app_name }}
           tee ${{ vars.REACT_PORTFOLIO_WEB_ENV_NAME }} > /dev/null <<EOF
