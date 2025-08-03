@@ -85,13 +85,13 @@ jobs:
 
       - name: Build ENV file
         run: |
-          echo "${{ secrets.GO_ENVIRONMENT_VARIABLE }}" > .env
+          echo "${{ secrets.GO_ENVIRONMENT_VARIABLE }}" > ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
 
       - name: List files
         run: |
           ls -la
 
-      - name: clear app workspace on app server
+      - name: Stop app
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.BACKEND_SERVER_HOST }}
@@ -99,13 +99,26 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            cd /home/${{ vars.GO_PORTFOLIO_API_USER}}
-            rm ./${{ inputs.app_name }}-app .env
+            sudo systemctl stop ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }}
+
+
+      - name: Clear app workspace on app server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_SERVER_HOST }}
+          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          script: |
+            if [ -f "/home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ inputs.app_name }}-app" ] && [ -f "/home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}" ]; then
+                rm ./${{ inputs.app_name }}-app ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
+                echo "Deleted files"
+            fi       
 
       - name: Upload file to app server
         run: |
-          scp -r ./${{ inputs.app_name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-          scp -r .env ${{ vars.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+          scp -r ./${{ inputs.app_name }}-app.zip ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+          scp -r ./${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
 
       - name: Unzip on app server
         uses: appleboy/ssh-action@v1.0.3
@@ -115,7 +128,29 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            cd /home/${{ vars.GO_PORTFOLIO_API_USER}}
+            cd /home/${{ vars.GO_PORTFOLIO_API_USER }}
             unzip -j ./${{ inputs.app_name }}-app.zip
             rm ./${{ inputs.app_name }}-app.zip
+            sudo chown ${{ vars.GO_PORTFOLIO_API_USER }}:${{ vars.GO_PORTFOLIO_API_GROUP }} /home/${{ vars.GO_PORTFOLIO_API_USER }}/{{ inputs.app_name }}-app /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
             ls -al
+
+      - name: Start app
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_SERVER_HOST }}
+          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          script: |
+            sudo systemctl daemon-reload
+            sudo systemctl start ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }}
+
+      - name: Check status app
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.BACKEND_SERVER_HOST }}
+          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          script: |
+            journalctl -u ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }} -n 50
