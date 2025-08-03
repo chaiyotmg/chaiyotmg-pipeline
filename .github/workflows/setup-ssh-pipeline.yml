@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-      - name: Clean up workspace
+      - name: Clean up runner workspace
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
@@ -56,3 +56,9 @@ jobs:
       - name: Set permission for known_hosts
         run: |
           chmod 644 ~/.ssh/known_hosts
+
+      - name: Clean up runner workspace
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
+          

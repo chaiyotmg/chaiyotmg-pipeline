@@ -1,21 +1,19 @@
-name: Debug Pipeline
+name: Create Server User For App
 on:
   workflow_dispatch:
     inputs:
       server_name:
-        description: 'Select Target Server'
+        description: 'Server name to setup'
         required: true
         type: choice
+        default: 'Back-End-Server'
         options:
-          - 'Runner'
           - 'Back-End-Server'
           - 'Front-End-Server'
-        default: 'Runner'
-      command:
-        description: 'Enter Linux command to execute'
+      username:
+        description: 'Username to create'
         required: true
-        default: ''
-
+        
 jobs:
   build:
     runs-on: self-hosted
@@ -24,11 +22,6 @@ jobs:
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
-
-      - name:  Execute command on Runner Server
-        if: ${{ inputs.server_name == 'Runner' }}
-        run: |
-            ${{ inputs.command }}
 
       - name: Execute command on Back-End Server
         uses: appleboy/ssh-action@v1.0.3
@@ -39,7 +32,10 @@ jobs:
           key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
-            ${{ inputs.command }}
+            if [ "$EUID" -ne 0 ]; then
+              echo "must run with root"
+              exit 1
+            fi
 
       - name: Execute command on Back-End Server
         uses: appleboy/ssh-action@v1.0.3
@@ -50,9 +46,13 @@ jobs:
           key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.FRONTEND_SERVER_PORT }}
           script: |
-            ${{ inputs.command }}
-  
+            if [ "$EUID" -ne 0 ]; then
+              echo "must run with root"
+              exit 1
+            fi
+
       - name: Clean up runner workspace
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
+    

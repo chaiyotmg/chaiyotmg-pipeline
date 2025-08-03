@@ -91,3 +91,7 @@ jobs:
         run: |
           scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ vars.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
             
+      - name: Clean up runner workspace
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf $(pwd)/*
