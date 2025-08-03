@@ -118,7 +118,7 @@ jobs:
 
       - name: Upload file to app server
         run: |
-          scp -r ./${{ inputs.app_name }}-app.zip ${{ secrets.FRONTEND_SERVER_USERNAME }}@${{ secrets.FRONTEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+          scp -r ./${{ inputs.app_name }}-app.zip ${{ secrets.FRONTEND_SERVER_USERNAME }}@${{ secrets.FRONTEND_SERVER_HOST }}:/home/${{ vars.REACT_PORTFOLIO_WEB_USER }}
 
       - name: Unzip file on app server
         uses: appleboy/ssh-action@v1.0.3
@@ -128,10 +128,9 @@ jobs:
           key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
           port: ${{ secrets.FRONTEND_SERVER_PORT }}
           script: |
-            cd /home/${{ vars.GO_PORTFOLIO_API_USER }}
-            unzip -j ./${{ inputs.app_name }}-app.zip
+            cd /home/${{ vars.REACT_PORTFOLIO_WEB_USER }}
+            unzip ./${{ inputs.app_name }}-app.zip
             rm ./${{ inputs.app_name }}-app.zip
-            sudo chown -R www-data:www-data /home/${{ vars.GO_PORTFOLIO_API_USER }}
             ls -la
 
       - name: Restart nginx
@@ -143,6 +142,24 @@ jobs:
           port: ${{ secrets.FRONTEND_SERVER_PORT }}
           script: |
             sudo systemctl restart nginx
+            sudo systemctl status nginx
+
+      - name: CURL Check status web
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.FRONTEND_SERVER_HOST }}
+          username: ${{ secrets.FRONTEND_SERVER_USERNAME }}
+          key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.FRONTEND_SERVER_PORT }}
+          script: |
+            URL="${{ vars.REACT_PORTFOLIO_WEB_URL }}"
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" -I "$URL")
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              echo "❌ Status code is $HTTP_STATUS (not 200)"
+              exit 1
+            else
+              echo "✅ Status code is 200"
+            fi
 
       - name: Clean up runner workspace
         if: always()
