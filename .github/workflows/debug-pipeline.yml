@@ -53,6 +53,7 @@ jobs:
             ${{ inputs.command }}
   
       - name: Clean up runner workspace
+        if: always()
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*

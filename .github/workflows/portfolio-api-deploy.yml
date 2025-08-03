@@ -171,6 +171,7 @@ jobs:
             journalctl -u ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }} -n 10
 
       - name: Clean up runner workspace
+        if: always()
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
