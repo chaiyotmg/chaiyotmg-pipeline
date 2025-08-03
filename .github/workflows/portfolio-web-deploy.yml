@@ -6,7 +6,7 @@ on:
         description: 'Branch app to pull'
         required: true
         default: 'main'
-      app-name:
+      app_name:
         description: 'App name to deploy'
         required: true
         type: choice
@@ -25,72 +25,165 @@ jobs:
   build:
     runs-on: self-hosted
     steps:
-      - name: Clean up workspace
+      - name: Clean up runner workspace
         run: |
           echo "Cleaning up temporary files..."
           rm -rf $(pwd)/*
           
-      - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app-name }} repository
+      - name: Checkout ${{ vars.USERNAME }}/${{ inputs.app_name }} repository
         if: ${{ inputs.build_app == false }}
         uses: actions/checkout@v2
         with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
+          repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           ref: ${{ inputs.branch }}
-          path: ${{ inputs.app-name }}
+          path: ${{ inputs.app_name }}
           fetch-depth: 1
           submodules: false
 
-      - name: Build app...
+      - name: Install packages
         if: ${{ inputs.build_app == false }}
         run: |
-          cd ${{ inputs.app-name }}
-          GOOS=linux GOARCH=amd64 GOMAXPROCS=1 go build -o ${{ inputs.app-name }}-app ./cmd/server/main.go
-          mv ${{ inputs.app-name }}-app ../${{ inputs.app-name }}-app
+          cd ${{ inputs.app_name }}
+          yarn install
 
-      - name: Create zip file
+      - name: Build web app
         if: ${{ inputs.build_app == false }}
         run: |
-          zip ${{ inputs.app-name }}-app.zip ${{ inputs.app-name }}-app
-          echo "Created ${{ inputs.app-name }}-app.zip"
-    
-      - name: Upload app to github packages
-        if: ${{ inputs.build_app == false }}
-        uses: softprops/action-gh-release@v2
-        with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
-          files: ${{ inputs.app-name }}-app.zip
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-          tag_name: ${{ inputs.tag }}
-
-      - name: Download github packages
-        if: ${{ inputs.build_app == true }}
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: ${{ vars.USERNAME }}/${{ inputs.app-name }}
-          tag: ${{ inputs.tag }}
-          fileName: ${{ inputs.app-name }}-app.zip
-          token: ${{ secrets.REPO_ACCESS_TOKEN }}
-
-      - name: Check if zip file exists
-        run: |
-          FILE_PATH="./${{ inputs.app-name }}-app.zip"
-          if [ -f "$FILE_PATH" ]; then
-            echo "✅ File '$FILE_PATH' found successfully!"
-            ls -lh "$FILE_PATH"
-          else
-            echo "❌ Error: File '$FILE_PATH' not found!"
-            exit 1
-          fi  
+          cd ${{ inputs.app_name }}
+          yarn build
 
       - name: List files
         run: |
           ls -la
 
-      - name: Upload app to server
+      - name: Create zip file
+        if: ${{ inputs.build_app == false }}
         run: |
-          scp -r ./${{ inputs.app-name }}-app.zip ${{ vars.BACKEND_SERVER_USERNAME }}@${{ vars.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-            
+          cd ${{ inputs.app_name }}/dist
+          zip -r ../../${{ inputs.app_name }}-app.zip .
+          echo "Created ${{ inputs.app_name }}-app.zip"
+    
+      - name: List files
+        run: |
+          ls -la
+
+      - name: Upload app to github packages
+        if: ${{ inputs.build_app == false }}
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
+          files: ${{ inputs.app_name }}-app.zip
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          tag_name: ${{ inputs.tag }}
+
+      # - name: Download github packages
+      #   if: ${{ inputs.build_app == true }}
+      #   uses: robinraju/release-downloader@v1
+      #   with:
+      #     repository: ${{ vars.USERNAME }}/${{ inputs.app_name }}
+      #     tag: ${{ inputs.tag }}
+      #     fileName: ${{ inputs.app_name }}-app.zip
+      #     token: ${{ secrets.REPO_ACCESS_TOKEN }}
+
+      # - name: Check zip file exists
+      #   run: |
+      #     FILE_PATH="./${{ inputs.app_name }}-app.zip"
+      #     if [ -f "$FILE_PATH" ]; then
+      #       echo "✅ File '$FILE_PATH' found successfully!"
+      #       ls -lh "$FILE_PATH"
+      #     else
+      #       echo "❌ Error: File '$FILE_PATH' not found!"
+      #       exit 1
+      #     fi
+
+      # - name: Setup ENV file
+      #   run: |
+      #     tee ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} > /dev/null <<EOF
+      #         ${{ secrets.GO_ENVIRONMENT_VARIABLE }}
+      #     EOF
+
+      # - name: List files
+      #   run: |
+      #     ls -la
+
+      # - name: Stop app
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       sudo systemctl stop ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }}
+
+      # - name: Setup app systemd service on app server
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       sudo tee /etc/systemd/system/${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }} > /dev/null <<EOF
+      #         ${{ vars.GO_PORTFOLIO_API_SERVICE }}
+      #       EOF
+
+      # - name: Clean up app workspace on app server
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       if [ "$(ls -A /home/${{ vars.GO_PORTFOLIO_API_USER }})" ]; then
+      #         rm /home/${{ vars.GO_PORTFOLIO_API_USER }}/* /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
+      #         echo "Files deleted."
+      #       else
+      #         echo "Directory is empty. Nothing to delete."
+      #       fi 
+
+      # - name: Upload file to app server
+      #   run: |
+      #     scp -r ./${{ inputs.app_name }}-app.zip ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+      #     scp -r ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+
+      # - name: Unzip file on app server
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       cd /home/${{ vars.GO_PORTFOLIO_API_USER }}
+      #       unzip -j ./${{ inputs.app_name }}-app.zip
+      #       rm ./${{ inputs.app_name }}-app.zip
+      #       sudo chown ${{ vars.GO_PORTFOLIO_API_USER }}:${{ vars.GO_PORTFOLIO_API_GROUP }} /home/${{ vars.GO_PORTFOLIO_API_USER }}/{{ inputs.app_name }}-app /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
+      #       ls -la
+
+      # - name: Start app
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       sudo systemctl daemon-reload
+      #       sudo systemctl start ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }}
+
+      # - name: Check status app
+      #   uses: appleboy/ssh-action@v1.0.3
+      #   with:
+      #     host: ${{ secrets.BACKEND_SERVER_HOST }}
+      #     username: ${{ secrets.BACKEND_SERVER_USERNAME }}
+      #     key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
+      #     port: ${{ secrets.BACKEND_SERVER_PORT }}
+      #     script: |
+      #       journalctl -u ${{ vars.GO_PORTFOLIO_API_SERVICE_NAME }} -n 10
+
       - name: Clean up runner workspace
         run: |
           echo "Cleaning up temporary files..."
