@@ -85,7 +85,7 @@ jobs:
 
       - name: Setup ENV file
         run: |
-          tee ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} > /dev/null <<EOF
+          tee ${{ vars.GO_PORTFOLIO_API_ENV_NAME }} > /dev/null <<EOF
               ${{ secrets.GO_ENVIRONMENT_VARIABLE }}
           EOF
 
@@ -124,7 +124,7 @@ jobs:
           port: ${{ secrets.BACKEND_SERVER_PORT }}
           script: |
             if [ "$(ls -A /home/${{ vars.GO_PORTFOLIO_API_USER }})" ]; then
-              rm /home/${{ vars.GO_PORTFOLIO_API_USER }}/* /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
+              rm /home/${{ vars.GO_PORTFOLIO_API_USER }}/* /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_NAME }}
               echo "Files deleted."
             else
               echo "Directory is empty. Nothing to delete."
@@ -133,7 +133,7 @@ jobs:
       - name: Upload file to app server
         run: |
           scp -r ./${{ inputs.app_name }}-app.zip ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
-          scp -r ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
+          scp -r ${{ vars.GO_PORTFOLIO_API_ENV_NAME }} ${{ secrets.BACKEND_SERVER_USERNAME }}@${{ secrets.BACKEND_SERVER_HOST }}:/home/${{ vars.GO_PORTFOLIO_API_USER}}
 
       - name: Unzip file on app server
         uses: appleboy/ssh-action@v1.0.3
@@ -146,7 +146,7 @@ jobs:
             cd /home/${{ vars.GO_PORTFOLIO_API_USER }}
             unzip -j ./${{ inputs.app_name }}-app.zip
             rm ./${{ inputs.app_name }}-app.zip
-            sudo chown ${{ vars.GO_PORTFOLIO_API_USER }}:${{ vars.GO_PORTFOLIO_API_GROUP }} /home/${{ vars.GO_PORTFOLIO_API_USER }}/{{ inputs.app_name }}-app /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
+            sudo chown ${{ vars.GO_PORTFOLIO_API_USER }}:${{ vars.GO_PORTFOLIO_API_GROUP }} /home/${{ vars.GO_PORTFOLIO_API_USER }}/{{ inputs.app_name }}-app /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_NAME }}
             ls -la
 
       - name: Start app
