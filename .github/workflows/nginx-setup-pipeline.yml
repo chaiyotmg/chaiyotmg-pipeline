@@ -1,19 +1,15 @@
-name: nginx-setup
+name: Setup Nginx Server
 on:
   workflow_dispatch:
     inputs:
-      setupFrontEnd:
-        description: 'Setup Front-end?' # Checkbox ตัวที่ 1
+      server_name:
+        description: 'Server name to setup'
         required: true
-        default: 'false'
-        type: boolean
-      setupBackEnd:
-        description: 'Setup Back-end?' # Checkbox ตัวที่ 2
-        required: true
-        default: 'false'
-        type: boolean
-#   push:
-#     branches: [ "main" ]
+        type: choice
+        default: 'Back-End-Server'
+        options:
+          - 'Back-End-Server'
+          - 'Front-End-Server'
 
 jobs:
   build:

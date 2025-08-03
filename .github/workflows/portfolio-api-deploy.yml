@@ -85,7 +85,7 @@ jobs:
 
       - name: Setup ENV file
         run: |
-          sudo tee ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} > /dev/null <<EOF
+          tee ${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }} > /dev/null <<EOF
               ${{ secrets.GO_ENVIRONMENT_VARIABLE }}
           EOF
 
@@ -147,7 +147,7 @@ jobs:
             unzip -j ./${{ inputs.app_name }}-app.zip
             rm ./${{ inputs.app_name }}-app.zip
             sudo chown ${{ vars.GO_PORTFOLIO_API_USER }}:${{ vars.GO_PORTFOLIO_API_GROUP }} /home/${{ vars.GO_PORTFOLIO_API_USER }}/{{ inputs.app_name }}-app /home/${{ vars.GO_PORTFOLIO_API_USER }}/${{ vars.GO_PORTFOLIO_API_ENV_FILE_NAME }}
-            ls -al
+            ls -la
 
       - name: Start app
         uses: appleboy/ssh-action@v1.0.3
