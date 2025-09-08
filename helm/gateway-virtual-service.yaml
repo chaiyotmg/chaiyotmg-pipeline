@@ -1,0 +1,40 @@
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: public-gw
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - portfolio-api-dev.chaiyot.dev
+    - portfolio-api.chaiyot.dev
+    tls:
+      mode: SIMPLE
+      credentialName: edge-tls
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: echo
+  namespace: microservice-dev
+spec:
+  hosts:
+  - portfolio-api-dev.chaiyot.dev
+  - portfolio-api.chaiyot.dev
+  gateways:
+  - istio-system/public-gw
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: echo.microservice-dev.svc.cluster.local
+        port:
+          number: 80
