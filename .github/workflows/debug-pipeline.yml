@@ -7,10 +7,10 @@ on:
         required: true
         type: choice
         options:
-          - 'Runner'
-          - 'Back-End-Server'
-          - 'Front-End-Server'
-        default: 'Runner'
+          - 'runner-server'
+          - 'kube-master-node-server'
+          - 'private-registry-server'
+        default: 'runner-server'
       command:
         description: 'Enter Linux command to execute'
         required: true
@@ -26,29 +26,29 @@ jobs:
           rm -rf $(pwd)/*
 
       - name:  Execute command on Runner Server
-        if: ${{ inputs.server_name == 'Runner' }}
+        if: ${{ inputs.server_name == 'runner-server' }}
         run: |
             ${{ inputs.command }}
 
-      - name: Execute command on Back-End Server
+      - name: Execute command on Kubernetes Master Node Server
         uses: appleboy/ssh-action@v1.0.3
-        if: ${{ inputs.server_name == 'Back-End-Server' }}
+        if: ${{ inputs.server_name == 'kube-master-node-server' }}
         with:
-          host: ${{ secrets.BACKEND_SERVER_HOST }}
-          username: ${{ secrets.BACKEND_SERVER_USERNAME }}
-          key: ${{ secrets.BACKEND_SERVER_PRIVATE_KEY }}
-          port: ${{ secrets.BACKEND_SERVER_PORT }}
+          host: ${{ secrets.KUBE_MASTER_NODE_SERVER_HOST }}
+          username: ${{ secrets.KUBE_MASTER_NODE_SERVER_USERNAME }}
+          key: ${{ secrets.KUBE_MASTER_NODE_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.KUBE_MASTER_NODE_SERVER_PORT }}
           script: |
             ${{ inputs.command }}
 
-      - name: Execute command on Front-End Server
+      - name: Execute command on Private Registry Server
         uses: appleboy/ssh-action@v1.0.3
-        if: ${{ inputs.server_name == 'Front-End-Server' }}
+        if: ${{ inputs.server_name == 'private-registry-server' }}
         with:
-          host: ${{ secrets.FRONTEND_SERVER_HOST }}
-          username: ${{ secrets.FRONTEND_SERVER_USERNAME }}
-          key: ${{ secrets.FRONTEND_SERVER_PRIVATE_KEY }}
-          port: ${{ secrets.FRONTEND_SERVER_PORT }}
+          host: ${{ secrets.PRIVATE_REGISTRY_SERVER_HOST }}
+          username: ${{ secrets.PRIVATE_REGISTRY_SERVER_USERNAME }}
+          key: ${{ secrets.PRIVATE_REGISTRY_SERVER_PRIVATE_KEY }}
+          port: ${{ secrets.PRIVATE_REGISTRY_SERVER_PORT }}
           script: |
             ${{ inputs.command }}
   
