@@ -25,7 +25,6 @@ metadata:
   name: microservice-dev
   labels:
     name: microservice-dev
-    istio-injection: enabled
 ---
 apiVersion: v1
 kind: Namespace
@@ -33,5 +32,4 @@ metadata:
   name: microservice-prod
   labels:
     name: microservice-prod
-    istio-injection: enabled
 ---
