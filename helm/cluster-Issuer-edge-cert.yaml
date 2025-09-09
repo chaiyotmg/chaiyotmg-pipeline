@@ -6,7 +6,8 @@ spec:
   acme:
     email: chaiyot.mg@gmail.com
     server: https://acme-v02.api.letsencrypt.org/directory
-    privateKeySecretRef: { name: letsencrypt-account-key }
+    privateKeySecretRef: 
+      name: letsencrypt-account-key
     solvers:
     - http01:
         ingress:
@@ -20,9 +21,9 @@ metadata:
 spec:
   secretName: edge-tls
   dnsNames:
-  - portfolio-api-dev.chaiyot.dev
+  - dev-portfolio-api.chaiyot.dev
+  - dev-portfolio.chaiyot.dev
   - portfolio-api.chaiyot.dev
-  - portfolio-dev.chaiyot.dev
   - portfolio.chaiyot.dev
   issuerRef:
     kind: ClusterIssuer

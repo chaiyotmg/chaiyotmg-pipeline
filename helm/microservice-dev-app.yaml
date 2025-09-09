@@ -1,0 +1,47 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jsonplaceholder
+  namespace: microservice-dev
+  labels:
+    app: jsonplaceholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jsonplaceholder
+  template:
+    metadata:
+      labels:
+        app: jsonplaceholder
+    spec:
+      containers:
+        - name: jsonplaceholder
+          image: svenwal/jsonplaceholder
+          ports:
+            - name: http
+              containerPort: 3000
+          resources:
+            requests:
+              cpu: 25m
+              memory: 32Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: echo
+  namespace: microservice-dev
+  labels:
+    app: jsonplaceholder
+spec:
+  selector:
+    app: jsonplaceholder
+  ports:
+    - name: jsonplaceholder
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
