@@ -1,0 +1,33 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-http
+spec:
+  acme:
+    email: chaiyot.mg@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef: 
+      name: letsencrypt-account-key
+    solvers:
+    - http01:
+        ingress:
+          class: istio
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: edge-cert
+  namespace: istio-system
+spec:
+  secretName: edge-tls
+  dnsNames:
+  - dev-portfolio-api.chaiyot.dev
+  - dev-portfolio.chaiyot.dev
+  - portfolio-api.chaiyot.dev
+  - portfolio.chaiyot.dev
+  - grafana-k8s-private.chaiyot.dev
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-http
+  privateKey:
+    rotationPolicy: Always

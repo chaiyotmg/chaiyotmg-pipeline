@@ -1,0 +1,126 @@
+
+kube-prometheus-stack:
+
+  # -----------------------------
+  # Grafana (≈ 0.5Gi)
+  # -----------------------------
+  grafana:
+    enabled: true
+    adminPassword: "!SuperPassAdminGrafana99"
+    defaultDashboardsEnabled: true
+    sidecar:
+      dashboards:
+        enabled: true
+      datasources:
+        enabled: true
+    service:
+      type: ClusterIP
+    persistence:
+      enabled: true
+      type: pvc
+      accessModes: ["ReadWriteOnce"]
+      size: 512Mi
+      # storageClassName: ""   # <- ใส่ชื่อ SC ถ้าต้องการ
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+
+  # -----------------------------
+  # Prometheus (≈ 6Gi, retention 7d)
+  # -----------------------------
+  prometheus:
+    service:
+      type: ClusterIP
+    prometheusSpec:
+      replicas: 1
+      retention: 7d
+      retentionSize: 5.5GB     # กันพื้นที่ให้เล็กกว่าขนาด PVC เผื่อ WAL/compact
+      walCompression: true
+      enableAdminAPI: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 6Gi
+            # storageClassName: ""   # <- ใส่ชื่อ SC ถ้าต้องการ
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+
+  # -----------------------------
+  # Alertmanager (≈ 0.5Gi)
+  # -----------------------------
+  alertmanager:
+    service:
+      type: ClusterIP
+    alertmanagerSpec:
+      replicas: 1
+      storage:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 512Mi
+            # storageClassName: ""   # <- ใส่ชื่อ SC ถ้าต้องการ
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
+
+  # -----------------------------
+  # kube-state-metrics / node-exporter / operator
+  # -----------------------------
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+  prometheus-node-exporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+
+  prometheusOperator:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
+    admissionWebhooks:
+      patch:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 32Mi
+          limits:
+            cpu: 50m
+            memory: 64Mi
+
+kube-prometheus-stack:
+  enabled: true

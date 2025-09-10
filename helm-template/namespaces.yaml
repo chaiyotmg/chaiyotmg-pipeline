@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    name: cert-manager
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    name: istio-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metallb-system
+  labels:
+    name: metallb-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+  labels:
+    name: monitoring
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microservice-dev
+  labels:
+    name: microservice-dev
+    istio-injection: "enabled"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: microservice-prod
+  labels:
+    name: microservice-prod
+    istio-injection: "enabled"
+---

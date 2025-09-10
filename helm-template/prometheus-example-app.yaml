@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prom-example
+  namespace: microservice-dev
+  labels:
+    app: prom-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prom-example
+  template:
+    metadata:
+      labels:
+        app: prom-example
+    spec:
+      containers:
+      - name: prom-example
+        image: ghcr.io/stefanprodan/podinfo:6.8.0
+        ports:
+        - name: http
+          containerPort: 9898
+        readinessProbe:
+          httpGet: 
+            path: /readyz
+            port: http
+        livenessProbe:
+          httpGet: 
+            path: /healthz
+            port: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prom-example
+  namespace: microservice-dev
+  labels:
+    app: prom-example
+spec:
+  selector:
+    app: prom-example
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9898
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: prom-example
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+    - microservice-dev
+  selector:
+    matchLabels:
+      app: prom-example
+  endpoints:
+  - port: http
+    path: /metrics
+    interval: 15s
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: monitoring-defaults
+  namespace: monitoring
+spec:
+  limits:
+  - type: Container
+    default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: monitoring-quota
+  namespace: monitoring
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana
+  namespace: monitoring
+spec:
+  hosts:
+    - grafana-k8s-private.chaiyot.dev
+  gateways:
+    - istio-system/public-gw
+  http:
+  - match:
+    - port: 443
+      uri:
+        prefix: /
+    route:
+      - destination:
+          host: kps-grafana.monitoring.svc.cluster.local
+          port:
+            number: 80
+---
